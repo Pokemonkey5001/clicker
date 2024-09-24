@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Enhanced Clicker Game</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* General Styles */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .game-container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        #score-display {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        /* Buttons */
+        button {
+            background-color: #ff7675;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #d63031;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        #click-button {
+            display: block;
+            margin: 0 auto 40px auto;
+        }
+        /* Upgrades Section */
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .upgrades {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .upgrade {
+            background-color: #f5f6fa;
+            border: 1px solid #dcdde1;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 10px;
+            width: 250px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+        .upgrade:hover {
+            transform: translateY(-5px);
+        }
+        .upgrade h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .upgrade p {
+            color: #555;
+        }
+        .upgrade .buy-options {
+            margin-top: 15px;
+        }
+        .upgrade .buy-options select,
+        .upgrade .buy-options button {
+            padding: 10px;
+            font-size: 16px;
+            margin-top: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        /* Top Buttons */
+        .top-button {
+            position: absolute;
+            top: 20px;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #74b9ff;
+            border-radius: 50px;
+            color: #fff;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+        .top-button:hover {
+            background-color: #0984e3;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        .achievements-button {
+            left: 20px;
+        }
+        .prestige-button {
+            left: 160px;
+        }
+        .skill-tree-button {
+            right: 160px;
+        }
+        .bonus-circle {
+            position: absolute;
+            right: 20px;
+        }
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow-y: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
+        }
+        .modal-content {
+            background-color: #ffffff;
+            margin: 5% auto; /* 5% from top and centered */
+            padding: 30px;
+            border: 1px solid #ddd;
+            width: 90%; /* Could be more or less, depending on screen size */
+            max-width: 800px;
+            border-radius: 12px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .close-modal {
+            color: #aaa;
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-modal:hover {
+            color: #333;
+        }
+        .modal h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        /* Prestige Modal */
+        .prestige-modal-content {
+            background-color: #ffffff;
+            margin: 5% auto;
+            padding: 30px;
+            border: 1px solid #ddd;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 12px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .prestige-modal-content button {
+            padding: 12px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            border-radius: 50px;
+            border: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .confirm-button {
+            background-color: #55efc4;
+            color: #2d3436;
+        }
+        .confirm-button:hover {
+            background-color: #00b894;
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        .cancel-button {
+            background-color: #fab1a0;
+            color: #2d3436;
+        }
+        .cancel-button:hover {
+            background-color: #e17055;
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        /* Bonus Circle */
+        #bonus-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            background-color: #ffeaa7;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            animation: vibrate 0.1s infinite;
+            z-index: 1000;
+        }
+        #bonus-circle p {
+            font-size: 24px;
+            color: #2d3436;
+            margin: 0;
+        }
+        @keyframes vibrate {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            25% { transform: translate(-52%, -48%) rotate(-1deg); }
+            50% { transform: translate(-50%, -50%) rotate(0deg); }
+            75% { transform: translate(-48%, -52%) rotate(1deg); }
+            100% { transform: translate(-50%, -50%) rotate(0deg); }
+        }
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .upgrade {
+                width: 100%;
+            }
+            .top-button {
+                position: static;
+                margin: 10px;
+                display: block;
+                text-align: center;
+            }
+            .prestige-button,
+            .achievements-button,
+            .skill-tree-button {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <a class="top-button achievements-button" id="achievements-button">Achievements</a>
+    <a class="top-button prestige-button" id="prestige-button">Prestige</a>
+    <a class="top-button skill-tree-button" id="skill-tree-button">Skill Tree</a>
+    <h1>Enhanced Clicker Game</h1>
+    <div id="score-display">Score: <span id="score">0</span></div>
+    <button id="click-button">Click Me!</button>
+    <h2>Upgrades</h2>
+    <div class="upgrades" id="upgrades-container">
+        <!-- Upgrades will be dynamically inserted here -->
+    </div>
+    <div id="bonus-circle">
+        <p>Click!</p>
+    </div>
+</div>
+
+<!-- Achievements Modal -->
+<div id="achievements-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" id="close-achievements">&times;</span>
+        <h2>Achievements</h2>
+        <div id="achievements-container">
+            <!-- Achievements will be dynamically inserted here -->
+        </div>
+    </div>
+</div>
+
+<!-- Prestige Modal -->
+<div id="prestige-modal" class="modal">
+    <div class="prestige-modal-content">
+        <span class="close-modal" id="close-prestige">&times;</span>
+        <h2>Prestige</h2>
+        <p>You can prestige to reset your progress and gain prestige points.</p>
+        <p><strong>Prestige Points Gained:</strong> <span id="prestige-points-gained">0</span></p>
+        <p><strong>Total Prestige Points:</strong> <span id="prestige-points-total">0</span></p>
+        <button class="confirm-button" id="confirm-prestige">Prestige Now</button>
+        <button class="cancel-button" id="cancel-prestige">Cancel</button>
+    </div>
+</div>
+
+<!-- Skill Tree Modal -->
+<div id="skill-tree-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" id="close-skill-tree">&times;</span>
+        <h2>Skill Tree</h2>
+        <p>You have <strong><span id="prestige-points">0</span></strong> prestige points to spend.</p>
+        <div class="skill-list" id="skill-list">
+            <!-- Skills will be dynamically inserted here -->
+        </div>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let pointsPerClick = 1;
+    let totalClicks = 0;
+    let totalUpgradesPurchased = 0;
+    let prestigePoints = 0;
+    let prestigePointsGained = 0;
+    let prestigeCount = 0;
+    let idlePoints = 0;
+    let lastActionTime = Date.now();
+    let purchasedSkills = {};
+    let cps = 0;
+    let lastClickTime = Date.now();
+    let clickCombo = 0;
+    let clickBonusActive = false;
+    let clickBonusMultiplier = 1;
+    let achievementsUnlocked = [];
+    let totalScoreEarned = 0;
+
+    const scoreDisplay = document.getElementById('score');
+    const clickButton = document.getElementById('click-button');
+    const upgradesContainer = document.getElementById('upgrades-container');
+    const bonusCircle = document.getElementById('bonus-circle');
+
+    // Generate 100 upgrades
+    const upgrades = [];
+    let baseCost = 50;
+    for (let i = 1; i <= 100; i++) {
+        upgrades.push({
+            id: i,
+            name: `Upgrade ${i}`,
+            description: `Increase points per click by ${i}`,
+            cost: baseCost,
+            increment: i,
+            purchased: 0 // Number of times purchased
+        });
+        baseCost = Math.floor(baseCost * 1.5); // Increase cost significantly
+    }
+
+    // Skills Data
+    const skills = [
+        { id: 1, name: 'Strengthened Finger', description: 'Increases base points per click by 1.', cost: 5, effect: () => { pointsPerClick += 1; }, unlocked: false },
+        { id: 2, name: 'Precision Clicking', description: 'Increases points per click by 10%.', cost: 10, effect: () => { pointsPerClick *= 1.1; }, unlocked: false },
+        { id: 3, name: 'Critical Clicks', description: 'Introduces a chance for critical clicks that deal double points.', cost: 15, effect: () => { purchasedSkills['Critical Clicks'] = true; }, unlocked: false },
+        { id: 4, name: 'Multi-Click', description: 'Each click has a chance to count as multiple clicks.', cost: 20, effect: () => { purchasedSkills['Multi-Click'] = true; }, unlocked: false },
+        { id: 5, name: 'Combo Builder', description: 'Increases points per click for each consecutive click without pausing.', cost: 25, effect: () => { purchasedSkills['Combo Builder'] = true; }, unlocked: false },
+        { id: 6, name: 'Click Frenzy', description: 'Temporarily boosts clicking power after achieving rapid clicks.', cost: 30, effect: () => { purchasedSkills['Click Frenzy'] = true; }, unlocked: false },
+        { id: 7, name: 'Frugal Spending', description: 'Reduces the cost of upgrades by 10%.', cost: 10, effect: () => { purchasedSkills['Frugal Spending'] = true; updateUpgradeCosts(); }, unlocked: false },
+        { id: 8, name: 'Bulk Discount', description: 'Provides cost reductions when purchasing multiple items.', cost: 15, effect: () => { purchasedSkills['Bulk Discount'] = true; }, unlocked: false },
+        { id: 9, name: 'Energy Efficiency', description: 'Decreases the cost of automated systems (Not implemented).', cost: 10, effect: () => { /* For future use */ }, unlocked: false }
+    ];
+
+    // Achievements Data
+    const achievements = [
+        // Total Clicks Achievements
+        {
+            category: 'Total Clicks Achievements',
+            achievements: [
+                { id: 1, name: 'First Click', description: 'Make your first click.', requirement: 1, type: 'totalClicks', unlocked: false },
+                { id: 2, name: 'Click Apprentice', description: 'Reach 100 total clicks.', requirement: 100, type: 'totalClicks', unlocked: false },
+                { id: 3, name: 'Click Adept', description: 'Reach 1,000 total clicks.', requirement: 1000, type: 'totalClicks', unlocked: false },
+                { id: 4, name: 'Click Master', description: 'Reach 10,000 total clicks.', requirement: 10000, type: 'totalClicks', unlocked: false },
+                { id: 5, name: 'Click King', description: 'Reach 50,000 total clicks.', requirement: 50000, type: 'totalClicks', unlocked: false },
+                { id: 6, name: 'Click Grandmaster', description: 'Reach 100,000 total clicks.', requirement: 100000, type: 'totalClicks', unlocked: false },
+                { id: 7, name: 'Click Deity', description: 'Reach 1,000,000 total clicks.', requirement: 1000000, type: 'totalClicks', unlocked: false },
+                { id: 8, name: 'Click Pro', description: 'Reach 1,000,000,000,000 total clicks.', requirement: 1000000000000, type: 'totalClicks', unlocked: false },
+                { id: 9, name: 'Click Hacker', description: 'Reach 1,000,000,000,000,000,000 clicks.', requirement: 1000000000000000000, type: 'totalClicks', unlocked: false }
+            ]
+        },
+        // Total Score Achievements
+        {
+            category: 'Total Score Achievements',
+            achievements: [
+                { id: 14, name: 'Getting Started', description: 'Earn 1,000 total points.', requirement: 1000, type: 'totalScore', unlocked: false },
+                { id: 15, name: 'Making Progress', description: 'Earn 10,000 total points.', requirement: 10000, type: 'totalScore', unlocked: false },
+                { id: 16, name: 'Point Millionaire', description: 'Earn 1,000,000 total points.', requirement: 1000000, type: 'totalScore', unlocked: false },
+                { id: 17, name: 'Point Billionaire', description: 'Earn 1,000,000,000 total points.', requirement: 1000000000, type: 'totalScore', unlocked: false },
+                { id: 18, name: 'Point Trillionaire', description: 'Earn 1,000,000,000,000 total points.', requirement: 1000000000000, type: 'totalScore', unlocked: false },
+                { id: 19, name: 'Infinite Wealth', description: 'Earn 1,000,000,000,000,000 total points.', requirement: 1000000000000000, type: 'totalScore', unlocked: false }
+            ]
+        },
+        // Upgrade Purchase Achievements
+        {
+            category: 'Upgrade Purchase Achievements',
+            achievements: [
+                { id: 20, name: 'First Upgrade', description: 'Purchase your first upgrade.', requirement: 1, type: 'upgrades', unlocked: false },
+                { id: 21, name: 'Upgrade Enthusiast', description: 'Purchase 10 upgrades.', requirement: 10, type: 'upgrades', unlocked: false },
+                { id: 22, name: 'Upgrade Collector', description: 'Purchase 50 upgrades.', requirement: 50, type: 'upgrades', unlocked: false },
+                { id: 23, name: 'Upgrade Tycoon', description: 'Purchase 100 upgrades.', requirement: 100, type: 'upgrades', unlocked: false }
+            ]
+        },
+        // Prestige Achievements
+        {
+            category: 'Prestige Achievements',
+            achievements: [
+                { id: 24, name: 'Starting Over', description: 'Perform your first prestige.', requirement: 1, type: 'prestige', unlocked: false },
+                { id: 25, name: 'Rebirth', description: 'Prestige 5 times.', requirement: 5, type: 'prestige', unlocked: false },
+                { id: 26, name: 'Eternal Cycle', description: 'Prestige 10 times.', requirement: 10, type: 'prestige', unlocked: false },
+                { id: 27, name: 'Infinite Loop', description: 'Prestige 50 times.', requirement: 50, type: 'prestige', unlocked: false }
+            ]
+        }
+    ];
+
+    // Function to render upgrades (allows buying 1, 10, or 100)
+    function renderUpgrades() {
+        upgradesContainer.innerHTML = '';
+        const availableUpgrades = upgrades.slice(0, 10);
+        availableUpgrades.forEach(upg => {
+            const upgradeDiv = document.createElement('div');
+            upgradeDiv.classList.add('upgrade');
+            upgradeDiv.innerHTML = `
+                <h3>${upg.name}</h3>
+                <p>${upg.description}</p>
+                <p><strong>Cost:</strong> ${Math.floor(upg.cost)}</p>
+                <div class="buy-options">
+                    <select id="quantity-${upg.id}">
+                        <option value="1">Buy 1</option>
+                        <option value="10">Buy 10</option>
+                        <option value="100">Buy 100</option>
+                    </select>
+                    <button id="buy-upgrade-${upg.id}">Purchase</button>
+                </div>
+            `;
+            upgradesContainer.appendChild(upgradeDiv);
+
+            // Add event listener for the purchase button
+            document.getElementById(`buy-upgrade-${upg.id}`).addEventListener('click', () => {
+                const quantity = parseInt(document.getElementById(`quantity-${upg.id}`).value);
+                purchaseUpgrade(upg.id, quantity);
+            });
+        });
+    }
+
+    // Function to purchase upgrades
+    function purchaseUpgrade(id, quantity) {
+        const upg = upgrades.find(u => u.id === id);
+        let totalCost = 0;
+        let bulkDiscount = 1;
+
+        // Calculate total cost with bulk discount
+        if (purchasedSkills['Bulk Discount']) {
+            if (quantity >= 100) {
+                bulkDiscount = 0.85; // 15% discount
+            } else if (quantity >= 10) {
+                bulkDiscount = 0.90; // 10% discount
+            }
+        }
+
+        totalCost = 0;
+        let cost = upg.cost;
+        for (let i = 0; i < quantity; i++) {
+            totalCost += cost;
+            cost = cost * 1.5; // Increase cost for next purchase
+        }
+
+        totalCost *= bulkDiscount;
+
+        if (score >= totalCost) {
+            score -= totalCost;
+            upg.purchased += quantity;
+            totalUpgradesPurchased += quantity;
+            // Increase points per click
+            pointsPerClick += upg.increment * quantity;
+            // Update upgrade cost
+            upg.cost = cost;
+            updateScore();
+            renderUpgrades();
+        } else {
+            alert('Not enough points!');
+        }
+    }
+
+    // Function to update upgrade costs (e.g., when Frugal Spending is unlocked)
+    function updateUpgradeCosts() {
+        upgrades.forEach(upg => {
+            upg.cost *= 0.90; // Reduce cost by 10%
+        });
+        renderUpgrades();
+    }
+
+    // Update the displayed score
+    function updateScore() {
+        scoreDisplay.textContent = `${Math.floor(score)}`;
+        checkAchievements();
+    }
+
+    // Event listener for the main click button
+    clickButton.addEventListener('click', () => {
+        let totalPoints = pointsPerClick * clickBonusMultiplier;
+        totalClicks++;
+        totalScoreEarned += totalPoints;
+
+        // Apply Skill Effects
+        // Critical Clicks
+        if (purchasedSkills['Critical Clicks']) {
+            let critChance = 0.1; // 10% chance
+            if (Math.random() < critChance) {
+                totalPoints *= 2; // Double points
+            }
+        }
+
+        // Multi-Click
+        if (purchasedSkills['Multi-Click']) {
+            let multiClickChance = 0.05; // 5% chance
+            if (Math.random() < multiClickChance) {
+                totalPoints *= 2; // Count as double click
+                totalClicks++; // Additional click
+            }
+        }
+
+        // Combo Builder
+        if (purchasedSkills['Combo Builder']) {
+            let currentTime = Date.now();
+            if (currentTime - lastClickTime < 1000) { // Less than 1 second between clicks
+                clickCombo++;
+            } else {
+                clickCombo = 1;
+            }
+            totalPoints += clickCombo; // Increase points per combo
+            lastClickTime = currentTime;
+        }
+
+        score += totalPoints;
+        lastActionTime = Date.now();
+        updateScore();
+    });
+
+    // Achievements Modal Logic
+    const achievementsButton = document.getElementById('achievements-button');
+    const achievementsModal = document.getElementById('achievements-modal');
+    const closeAchievements = document.getElementById('close-achievements');
+    const achievementsContainer = document.getElementById('achievements-container');
+
+    achievementsButton.addEventListener('click', () => {
+        achievementsModal.style.display = 'block';
+        renderAchievements();
+    });
+
+    closeAchievements.addEventListener('click', () => {
+        achievementsModal.style.display = 'none';
+    });
+
+    // Prestige Modal Logic
+    const prestigeButton = document.getElementById('prestige-button');
+    const prestigeModal = document.getElementById('prestige-modal');
+    const prestigePointsGainedDisplay = document.getElementById('prestige-points-gained');
+    const prestigePointsTotalDisplay = document.getElementById('prestige-points-total');
+    const confirmPrestige = document.getElementById('confirm-prestige');
+    const cancelPrestige = document.getElementById('cancel-prestige');
+    const closePrestige = document.getElementById('close-prestige');
+
+    prestigeButton.addEventListener('click', () => {
+        calculatePrestigePoints();
+        prestigeModal.style.display = 'block';
+    });
+
+    cancelPrestige.addEventListener('click', () => {
+        prestigeModal.style.display = 'none';
+    });
+
+    confirmPrestige.addEventListener('click', () => {
+        applyPrestige();
+        prestigeModal.style.display = 'none';
+    });
+
+    closePrestige.addEventListener('click', () => {
+        prestigeModal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (event) => {
+        if (event.target == achievementsModal) {
+            achievementsModal.style.display = 'none';
+        }
+        if (event.target == prestigeModal) {
+            prestigeModal.style.display = 'none';
+        }
+        if (event.target == skillTreeModal) {
+            skillTreeModal.style.display = 'none';
+        }
+    });
+
+    // Skill Tree Modal Logic
+    const skillTreeButton = document.getElementById('skill-tree-button');
+    const skillTreeModal = document.getElementById('skill-tree-modal');
+    const closeSkillTree = document.getElementById('close-skill-tree');
+    const skillList = document.getElementById('skill-list');
+    const prestigePointsDisplay = document.getElementById('prestige-points');
+
+    skillTreeButton.addEventListener('click', () => {
+        prestigePointsDisplay.textContent = prestigePoints;
+        skillTreeModal.style.display = 'block';
+        renderSkills();
+    });
+
+    closeSkillTree.addEventListener('click', () => {
+        skillTreeModal.style.display = 'none';
+    });
+
+    // Function to purchase skills
+    function purchaseSkill(id) {
+        const skill = skills.find(s => s.id === id);
+        if (!skill.unlocked && prestigePoints >= skill.cost) {
+            prestigePoints -= skill.cost;
+            skill.unlocked = true;
+            skill.effect();
+            prestigePointsDisplay.textContent = prestigePoints;
+            renderSkills();
+            alert(`Skill Unlocked: ${skill.name}`);
+        } else {
+            alert('Not enough prestige points or skill already unlocked!');
+        }
+    }
+
+    // Function to render skills
+    function renderSkills() {
+        skillList.innerHTML = '';
+        skills.forEach(skill => {
+            const skillDiv = document.createElement('div');
+            skillDiv.classList.add('skill');
+            if (skill.unlocked) {
+                skillDiv.classList.add('unlocked');
+            }
+            skillDiv.innerHTML = `
+                <h3>${skill.name}</h3>
+                <p>${skill.description}</p>
+                <p><strong>Cost:</strong> ${skill.cost} Prestige Points</p>
+                ${!skill.unlocked ? `<button id="buy-skill-${skill.id}">Unlock Skill</button>` : '<p>Unlocked</p>'}
+            `;
+            skillList.appendChild(skillDiv);
+
+            if (!skill.unlocked) {
+                document.getElementById(`buy-skill-${skill.id}`).addEventListener('click', () => {
+                    purchaseSkill(skill.id);
+                });
+            }
+        });
+    }
+
+    // Function to calculate prestige points
+    function calculatePrestigePoints() {
+        prestigePointsGained = 3; // Grant 3 prestige points per prestige
+        prestigePointsGainedDisplay.textContent = prestigePointsGained;
+        prestigePointsTotalDisplay.textContent = prestigePoints;
+    }
+
+    // Function to apply prestige
+    function applyPrestige() {
+        calculatePrestigePoints();
+        prestigePoints += prestigePointsGained;
+        prestigeCount++;
+
+        // Reset game progress
+        score = 0;
+        pointsPerClick = 1;
+        totalClicks = 0;
+        totalUpgradesPurchased = 0;
+        totalScoreEarned = 0;
+
+        // Reset upgrades
+        upgrades.forEach(upg => {
+            upg.purchased = 0;
+            upg.cost = 50 * Math.pow(1.5, upg.id - 1); // Reset cost
+        });
+
+        // Update the game
+        updateScore();
+        renderUpgrades();
+
+        alert(`Prestige applied! You have ${prestigePoints} prestige points.`);
+        checkAchievements();
+    }
+
+    // Function to check for unlocked achievements
+    function checkAchievements() {
+        achievements.forEach(category => {
+            category.achievements.forEach(ach => {
+                if (!ach.unlocked) {
+                    switch (ach.type) {
+                        case 'totalClicks':
+                            if (totalClicks >= ach.requirement) {
+                                ach.unlocked = true;
+                                achievementsUnlocked.push(ach.name);
+                                alert(`Achievement Unlocked: ${ach.name}`);
+                            }
+                            break;
+                        case 'totalScore':
+                            if (totalScoreEarned >= ach.requirement) {
+                                ach.unlocked = true;
+                                achievementsUnlocked.push(ach.name);
+                                alert(`Achievement Unlocked: ${ach.name}`);
+                            }
+                            break;
+                        case 'upgrades':
+                            if (totalUpgradesPurchased >= ach.requirement) {
+                                ach.unlocked = true;
+                                achievementsUnlocked.push(ach.name);
+                                alert(`Achievement Unlocked: ${ach.name}`);
+                            }
+                            break;
+                        case 'prestige':
+                            if (prestigeCount >= ach.requirement) {
+                                ach.unlocked = true;
+                                achievementsUnlocked.push(ach.name);
+                                alert(`Achievement Unlocked: ${ach.name}`);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            });
+        });
+    }
+
+    // Function to render achievements
+    function renderAchievements() {
+        achievementsContainer.innerHTML = '';
+        achievements.forEach(category => {
+            const categoryDiv = document.createElement('div');
+            categoryDiv.classList.add('achievement-category');
+            categoryDiv.innerHTML = `<h3>${category.category}</h3>`;
+            const achievementList = document.createElement('div');
+            achievementList.classList.add('achievement-list');
+            category.achievements.forEach(ach => {
+                const achDiv = document.createElement('div');
+                achDiv.classList.add('achievement');
+                achDiv.classList.add(ach.unlocked ? 'unlocked' : 'locked');
+                achDiv.innerHTML = `
+                    <h4>${ach.name}</h4>
+                    <p>${ach.description}</p>
+                    <span class="status">${ach.unlocked ? '✓' : '✗'}</span>
+                `;
+                achievementList.appendChild(achDiv);
+            });
+            categoryDiv.appendChild(achievementList);
+            achievementsContainer.appendChild(categoryDiv);
+        });
+    }
+
+    // Bonus Circle Logic
+    function showBonusCircle() {
+        bonusCircle.style.display = 'flex';
+        const hideBonusCircle = setTimeout(() => {
+            bonusCircle.style.display = 'none';
+        }, 60000); // Hide after 1 minute
+
+        bonusCircle.addEventListener('click', activateClickBonus);
+
+        function activateClickBonus() {
+            clickBonusActive = true;
+            clickBonusMultiplier = 5;
+            bonusCircle.style.display = 'none';
+            bonusCircle.removeEventListener('click', activateClickBonus);
+
+            setTimeout(() => {
+                clickBonusActive = false;
+                clickBonusMultiplier = 1;
+            }, 30000); // Bonus lasts for 30 seconds
+        }
+    }
+
+    // Function to trigger bonus circle at random intervals
+    function triggerBonusCircle() {
+        const randomTime = Math.random() * (300000 - 60000) + 60000; // Between 1 minute and 5 minutes
+        setTimeout(() => {
+            showBonusCircle();
+            triggerBonusCircle();
+        }, randomTime);
+    }
+
+    // Start the bonus circle cycle
+    triggerBonusCircle();
+
+    // Initial rendering
+    renderUpgrades();
+</script>
+
+</body>
+</html>
